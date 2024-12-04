@@ -1,0 +1,11 @@
+# The snowflake dedicated login URL will be: https://<account>.snowflakecomputing.com
+# copy that account name and paste it into the Account field below
+# These are information for generating dbt-snowflake credentials
+Account: <account>
+
+Username: dbt
+Password: dbtPassword123
+Role: transform
+Warehouse: COMPUTE_WH
+Database: AIRBNB
+Schema: DEV

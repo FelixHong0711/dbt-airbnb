@@ -1,0 +1,1 @@
+code --install-extension ./innoverio.vscode-dbt-power-user-0.49.0.vsix

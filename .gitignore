@@ -1,0 +1,6 @@
+airbnb_w_dagster/*
+logs/
+.DS_Store
+local-setup/s3data/hosts.csv
+local-setup/s3data/listings.csv
+local-setup/s3data/reviews.csv
