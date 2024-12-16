@@ -1,0 +1,5 @@
+load_from:
+  - python_package:
+      package_name: airbnb_dagster.definitions
+      location_name: airbnb_dagster
+      working_directory: /opt/dagster/app/

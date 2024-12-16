@@ -6,6 +6,8 @@
 - **Orchestration**: Dagster for workflow automation.
 - **Visualization**: Power BI for data visualization.
 
+![overview](images/project_overview.png)
+
 ## 2. Project Purpose
 The goal of this project is to build an automated pipeline that processes raw data from Airbnb and transforms it into structured data for analysis. The final objective is to generate business insights through Power BI dashboards, orchestrated by Dagster and transformed by dbt.
 
@@ -44,14 +46,17 @@ If you use local-setup, you need to download data (hosts.csv, listings.csv, revi
 ## 6. Steps to Reproduce the Project
 
 ### Install Dependencies
+Install all dependencies listed in dbt_requirements.txt
+
 ```bash
-pip install dbt-core dbt-snowflake dbt-postgres dagster dagster-dbt dagster-webserver
+pip install -r dbt_requirements.txt
 ```
 
 ### Set up dbt
 Run the command to initialize the dbt project:
 ```bash
-dbt init airbnb
+cd airbnb_w_dagster
+dbt init airbnb_dbt
 # Select Snowflake as the database.
 # Enter your Snowflake account details: account, user, password, role, warehouse, db, schema.
 ```
@@ -59,16 +64,16 @@ dbt init airbnb
 Check dbt Setup
 
 ```bash
-cd airbnb
+cd airbnb_dbt
 dbt debug
 ```
 
 ### Copy Project Files into the dbt Folder
-- Note: You cannot run dbt unless it is initialized on your local machine. The files and folders in the airbnb directory provided here are for reference only. You need to manually copy the contents of these folders into your dbt folder.
+- Note: You cannot run dbt unless it is initialized on your local machine. The files and folders in the airbnb_dbt directory provided here are for reference only. You need to manually copy the contents of these folders into your dbt folder.
 
 Steps:
 
-- Open the airbnb folder.
+- Open the airbnb_dbt folder.
 
 - Copy the following files and folders:
     - models/ folder (for dbt models)
@@ -76,6 +81,7 @@ Steps:
     - snapshots/ folder (for snapshots)
     - tests/ folder (for custom tests)
     - macros/ folder (for custom dbt functions)
+    - analyses/ folder (for analyses scripts)
 
 - Paste these files into the corresponding directories in your local dbt project.
 
@@ -105,7 +111,7 @@ Steps:
     
   - You can also define generic test in macros folder.
 
-- Install extension packages by creating packages.yml under airbnb project folder and running `dbt deps`.
+- Install extension packages by creating packages.yml under airbnb_dbt project folder and running `dbt deps`.
 
 ```bash
 # Packages.yml
@@ -133,18 +139,7 @@ packages:
   - Connect Power BI to Snowflake using the account URL and credentials.
 
 - Dagster Orchestration
-    
-  - Scaffold the Dagster project:
-
-```bash
-dagster-dbt project scaffold --project-name airbnb_dagster --dbt-project-dir airbnb
-```
-
-  - Then copy profiles.yml into the airbnb folder and run the Dagster development server:
-  
-```bash
-dagster dev
-```
+  - Run `docker compose up --build -d`, then access to localhost:3000 to connect to Dagster webserver.
 
 By following these steps, you can set up an automated pipeline that extracts, transforms, and loads data into Snowflake, and visualize the results in Power BI.
 

@@ -1,0 +1,74 @@
+name: dbt
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: airbnb
+    ports:
+      - "5431:5432"
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d airbnb"]
+      interval: 10s
+      timeout: 8s
+      retries: 5
+ 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    ports:
+      - 5051:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=pgadmin@localhost.com
+      - PGADMIN_DEFAULT_PASSWORD=pgadmin
+ 
+  dagster_webserver:
+    image: dagster-webserver
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: dagster_webserver
+    entrypoint: ["dagster-webserver", "-h", "0.0.0.0", "-p", "3000", "-w", "workspace.yaml"]
+    expose:
+      - "3000"
+    ports:
+      - 3000:3000
+    environment:
+      DAGSTER_POSTGRES_USER: "postgres"
+      DAGSTER_POSTGRES_PASSWORD: "postgres"
+      DAGSTER_POSTGRES_DB: "airbnb"
+    volumes: # Make docker client accessible so we can terminate containers from the webserver
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/io_manager_storage:/tmp/io_manager_storage
+      # - ./airbnb_dagster:/opt/dagster/app/airbnb_dagster
+      - ./airbnb_dbt:/opt/dagster/app/airbnb_dbt
+    depends_on:
+      postgres:
+        condition: service_healthy
+ 
+  dagster-daemon:
+    image: dagster-daemon
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: dagster_daemon
+    entrypoint: ["dagster-daemon", "run"]
+    environment:
+      DAGSTER_POSTGRES_USER: "postgres"
+      DAGSTER_POSTGRES_PASSWORD: "postgres"
+      DAGSTER_POSTGRES_DB: "airbnb"
+    volumes: # Make docker client accessible so we can launch containers using host docker
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/io_manager_storage:/tmp/io_manager_storage
+      # - ./airbnb_dagster:/opt/dagster/app/airbnb_dagster
+      - ./airbnb_dbt:/opt/dagster/app/airbnb_dbt
+    depends_on:
+      postgres:
+        condition: service_healthy
+ 
+volumes:
+  postgres-db-volume:
